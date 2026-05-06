@@ -1,5 +1,6 @@
 [versions]
 agp = "9.1.1"
+firebaseUiAuth = "9.1.1"
 junit = "4.13.2"
 junitVersion = "1.1.5"
 espressoCore = "3.5.1"
@@ -15,6 +16,7 @@ credentialsPlayServicesAuth = "1.6.0"
 googleid = "1.2.0"
 
 [libraries]
+firebase-ui-auth = { module = "com.firebaseui:firebase-ui-auth", version.ref = "firebaseUiAuth" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
