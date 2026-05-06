@@ -1,4 +1,4 @@
-package com.das.euskadimov;
+package com.das.euskadimov.ui.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.das.euskadimov.R;
 import com.google.firebase.auth.FirebaseAuth;
 
 

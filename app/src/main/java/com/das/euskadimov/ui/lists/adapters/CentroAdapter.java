@@ -1,4 +1,4 @@
-package com.das.euskadimov;
+package com.das.euskadimov.ui.lists.adapters;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -6,6 +6,10 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.das.euskadimov.Centro;
+import com.das.euskadimov.R;
+
 import java.util.List;
 
 public class CentroAdapter extends RecyclerView.Adapter<CentroAdapter.CentroViewHolder> {

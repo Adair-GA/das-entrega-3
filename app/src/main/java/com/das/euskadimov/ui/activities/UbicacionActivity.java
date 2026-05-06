@@ -1,9 +1,10 @@
-package com.das.euskadimov;
+package com.das.euskadimov.ui.activities;
 
 import android.os.Bundle;
-import android.widget.TextView;
+
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
+
+import com.das.euskadimov.R;
 
 
 public class UbicacionActivity extends AppCompatActivity {

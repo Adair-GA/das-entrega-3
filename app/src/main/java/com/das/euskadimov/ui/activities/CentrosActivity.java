@@ -1,5 +1,5 @@
 
-package com.das.euskadimov;
+package com.das.euskadimov.ui.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,6 +7,10 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.das.euskadimov.Centro;
+import com.das.euskadimov.ui.lists.adapters.CentroAdapter;
+import com.das.euskadimov.R;
 
 import java.util.ArrayList;
 import java.util.List;
