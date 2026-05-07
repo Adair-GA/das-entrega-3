@@ -158,7 +158,7 @@ public class UbicacionActivity extends AppCompatActivity {
         btnUbicacionManual.setOnClickListener(v ->
                 Toast.makeText(
                         this,
-                        "Después permitiremos elegir un punto en el mapa",
+                        "Diselo Isaac Newton prrrrr",
                         Toast.LENGTH_SHORT
                 ).show()
         );
