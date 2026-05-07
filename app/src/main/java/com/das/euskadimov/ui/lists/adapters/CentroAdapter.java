@@ -38,7 +38,13 @@ public class CentroAdapter extends RecyclerView.Adapter<CentroAdapter.CentroView
     public void onBindViewHolder(@NonNull CentroViewHolder holder, int position) {
         Centro centro = listaCentros.get(position);
         holder.tvNombre.setText(centro.getNombre());
-        holder.tvCiudad.setText(centro.getCiudad());
+        String detalle = centro.getCiudad();
+
+        if (centro.getDireccion() != null && !centro.getDireccion().isEmpty()) {
+            detalle = centro.getCiudad() + " - " + centro.getDireccion();
+        }
+
+        holder.tvCiudad.setText(detalle);
 
         holder.itemView.setOnClickListener(v -> listener.onCentroClick(centro));
     }

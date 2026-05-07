@@ -1,19 +1,123 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F5F5"
-    android:padding="24dp">
+    android:background="#F5F7FA"
+    android:paddingTop="@dimen/safe_top_space">
 
-    <TextView
-        android:id="@+id/tvMensaje"
+    <LinearLayout
+        android:id="@+id/panelInfoCentro"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="18dp"
+        android:background="@android:color/white"
+        android:elevation="4dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:id="@+id/tvNombreCentroUbicacion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Centro seleccionado"
+            android:textStyle="bold"
+            android:textSize="20sp"
+            android:textColor="#1F2937" />
+
+        <TextView
+            android:id="@+id/tvUniversidadCentroUbicacion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Universidad"
+            android:textSize="14sp"
+            android:textColor="#4B5563" />
+
+        <TextView
+            android:id="@+id/tvDireccionCentroUbicacion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Dirección"
+            android:textSize="14sp"
+            android:textColor="#4B5563" />
+
+    </LinearLayout>
+
+    <org.osmdroid.views.MapView
+        android:id="@+id/mapaCentro"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/panelInfoCentro"
+        app:layout_constraintBottom_toTopOf="@id/panelBotonesRuta"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/panelBotonesMapa"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:text="Solo funciona"
-        android:textColor="#121212"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:gravity="center" />
+        android:orientation="horizontal"
+        android:padding="6dp"
+        android:background="#DDFFFFFF"
+        android:elevation="8dp"
+        app:layout_constraintTop_toTopOf="@id/mapaCentro"
+        app:layout_constraintEnd_toEndOf="@id/mapaCentro"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="12dp">
 
-</RelativeLayout>
+        <Button
+            android:id="@+id/btnEnfocarDestino"
+            android:layout_width="wrap_content"
+            android:layout_height="42dp"
+            android:minWidth="0dp"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:text="Destino"
+            android:textSize="12sp" />
+
+        <Button
+            android:id="@+id/btnEnfocarUsuario"
+            android:layout_width="wrap_content"
+            android:layout_height="42dp"
+            android:minWidth="0dp"
+            android:layout_marginStart="6dp"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:text="Mi ubicación"
+            android:textSize="12sp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/panelBotonesRuta"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:background="@android:color/white"
+        android:elevation="6dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <Button
+            android:id="@+id/btnUsarMiUbicacion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Encontrar ruta desde mi ubicación" />
+
+        <Button
+            android:id="@+id/btnUbicacionManual"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Elegir ubicación manualmente" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

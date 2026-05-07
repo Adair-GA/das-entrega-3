@@ -1,4 +1,3 @@
-
 package com.das.euskadimov.ui.activities;
 
 import android.content.Intent;
@@ -9,65 +8,48 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.das.euskadimov.Centro;
-import com.das.euskadimov.ui.lists.adapters.CentroAdapter;
 import com.das.euskadimov.R;
+import com.das.euskadimov.data.local.CentrosDbHelper;
+import com.das.euskadimov.ui.lists.adapters.CentroAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
+
 public class CentrosActivity extends AppCompatActivity {
 
     private RecyclerView rvCentros;
     private CentroAdapter adapter;
-    private List<Centro> listaFiltrada = new ArrayList<>();
+    private List<Centro> listaCentros = new ArrayList<>();
+    private CentrosDbHelper centrosDbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_centros);
 
-        // 1. Obtener la universidad seleccionada
         String uniSeleccionada = getIntent().getStringExtra("SELECTED_UNI");
+
+        centrosDbHelper = new CentrosDbHelper(this);
 
         rvCentros = findViewById(R.id.rvCentros);
         rvCentros.setLayoutManager(new LinearLayoutManager(this));
 
-        // 2. Obtener los datos desde la "Base de Datos"
-        // Este método es el que conectarás con tu clase de SQLite
-        listaFiltrada = obtenerCentrosDesdeDB(uniSeleccionada);
+        listaCentros = centrosDbHelper.obtenerCentrosPorUniversidad(uniSeleccionada);
 
-        // 3. Configurar el Adapter
-        adapter = new CentroAdapter(listaFiltrada, centro -> {
+        adapter = new CentroAdapter(listaCentros, centro -> {
             Intent intent = new Intent(CentrosActivity.this, UbicacionActivity.class);
+
+            intent.putExtra("CENTRO_ID", centro.getId());
             intent.putExtra("CENTRO_NOMBRE", centro.getNombre());
+            intent.putExtra("CENTRO_UNIVERSIDAD", centro.getUniversidad());
+            intent.putExtra("CENTRO_CIUDAD", centro.getCiudad());
+            intent.putExtra("CENTRO_DIRECCION", centro.getDireccion());
+            intent.putExtra("CENTRO_LATITUD", centro.getLatitud());
+            intent.putExtra("CENTRO_LONGITUD", centro.getLongitud());
+
             startActivity(intent);
         });
 
         rvCentros.setAdapter(adapter);
-    }
-
-    /**
-     * Este es el método que consultará tu SQLite.
-     * De momento devuelve datos fijos, pero su estructura ya es la correcta.
-     */
-    private List<Centro> obtenerCentrosDesdeDB(String universidad) {
-        List<Centro> resultados = new ArrayList<>();
-        
-        // AQUÍ IRÍA TU CONSULTA SQL: 
-        // SELECT * FROM centros WHERE universidad = 'Deusto'
-        
-        if (universidad.equals("Deusto")) {
-            resultados.add(new Centro("Facultad de Derecho", "Bilbao"));
-            resultados.add(new Centro("Ingeniería (ESIDE)", "Bilbao"));
-            resultados.add(new Centro("Campus San Sebastián", "Donostia"));
-        } else if (universidad.equals("EHU")) {
-            resultados.add(new Centro("Facultad de Bellas Artes", "Leioa"));
-            resultados.add(new Centro("Facultad de Educación", "Vitoria-Gasteiz"));
-            resultados.add(new Centro("Escuela de Ingeniería", "Bilbao"));
-        } else if (universidad.equals("Mondragon")) {
-            resultados.add(new Centro("Escuela Politécnica Superior", "Arrasate"));
-            resultados.add(new Centro("Enpresagintza", "Oñati"));
-        }
-
-        return resultados;
     }
 }
