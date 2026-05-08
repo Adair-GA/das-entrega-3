@@ -23,7 +23,7 @@
         tools:replace="android:allowBackup">
 
         <activity
-            android:name=".ui.activities.MainActivity"
+            android:name=".ui.activities.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -33,7 +33,7 @@
 
         <!-- Pantalla de Login (ya NO es inicio) -->
         <activity
-            android:name=".ui.activities.LoginActivity"
+            android:name=".ui.activities.MainActivity"
             android:exported="false" />
 
         <!-- Pantalla de Registro -->

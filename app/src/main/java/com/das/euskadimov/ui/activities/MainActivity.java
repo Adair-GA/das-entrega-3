@@ -1,34 +1,33 @@
 package com.das.euskadimov.ui.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.das.euskadimov.R;
-import com.firebase.ui.auth.AuthUI;
-import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract;
-import com.firebase.ui.auth.IdpResponse;
-import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.content.Intent;
-import android.util.Log;
-import android.widget.Toast;
-
-import java.util.Arrays;
-import java.util.List;
-
 public class MainActivity extends AppCompatActivity {
+
+    private FirebaseAuth mAuth;
+
+    private TextView tvWelcomeName;
+    private TextView tvToolbarInitials;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        var currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        if (currentUser == null) {
-            launchSignInActivity();
+        mAuth = FirebaseAuth.getInstance();
+
+        if (mAuth.getCurrentUser() == null) {
+            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
             return;
         }
 
@@ -37,53 +36,57 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupUI() {
         setContentView(R.layout.activity_main);
+
+        tvWelcomeName = findViewById(R.id.tvWelcomeName);
+        tvToolbarInitials = findViewById(R.id.tvToolbarInitials);
+
+        mostrarDatosUsuario();
+
         findViewById(R.id.cardDeusto).setOnClickListener(v -> openCentros("Deusto"));
         findViewById(R.id.cardEHU).setOnClickListener(v -> openCentros("EHU"));
         findViewById(R.id.cardMondragon).setOnClickListener(v -> openCentros("Mondragon"));
+    }
+
+    private void mostrarDatosUsuario() {
+        FirebaseUser usuario = mAuth.getCurrentUser();
+
+        String nombreMostrar = "Usuario";
+
+        if (usuario != null) {
+            if (usuario.isAnonymous()) {
+                nombreMostrar = "Invitado";
+            } else if (usuario.getDisplayName() != null && !usuario.getDisplayName().trim().isEmpty()) {
+                nombreMostrar = usuario.getDisplayName().trim();
+            } else if (usuario.getEmail() != null && !usuario.getEmail().trim().isEmpty()) {
+                nombreMostrar = usuario.getEmail().split("@")[0];
+            }
+        }
+
+        tvWelcomeName.setText("Hola, " + nombreMostrar + " 👋");
+        tvToolbarInitials.setText(obtenerIniciales(nombreMostrar));
+    }
+
+    private String obtenerIniciales(String nombre) {
+        if (nombre == null || nombre.trim().isEmpty()) {
+            return "--";
+        }
+
+        String[] partes = nombre.trim().split("\\s+");
+
+        if (partes.length == 1) {
+            String palabra = partes[0];
+            return palabra.substring(0, Math.min(2, palabra.length())).toUpperCase();
+        }
+
+        String primera = partes[0].substring(0, 1);
+        String segunda = partes[1].substring(0, 1);
+
+        return (primera + segunda).toUpperCase();
     }
 
     private void openCentros(String uniName) {
         Intent intent = new Intent(MainActivity.this, CentrosActivity.class);
         intent.putExtra("SELECTED_UNI", uniName);
         startActivity(intent);
-    }
-
-
-    private final ActivityResultLauncher<Intent> signInLauncher = registerForActivityResult(
-            new FirebaseAuthUIActivityResultContract(),
-            this::onSignInResult
-    );
-
-    private void launchSignInActivity() {
-        // Choose authentication providers
-        List<AuthUI.IdpConfig> providers = Arrays.asList(
-                new AuthUI.IdpConfig.EmailBuilder().build(),
-//                new AuthUI.IdpConfig.GoogleBuilder().build(),
-                new AuthUI.IdpConfig.AnonymousBuilder().build()
-        );
-
-        // Create and launch sign-in intent
-        Intent signInIntent = AuthUI.getInstance()
-                .createSignInIntentBuilder()
-                .setAvailableProviders(providers)
-                .build();
-        signInLauncher.launch(signInIntent);
-    }
-
-    private void onSignInResult(FirebaseAuthUIAuthenticationResult result) {
-        IdpResponse response = result.getIdpResponse();
-        if (result.getResultCode() == RESULT_OK) {
-            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-            setupUI();
-        } else {
-            if (response == null) {
-                Toast.makeText(this, "Si no deseas iniciar sesión, presiona 'Continuar como invitado'", Toast.LENGTH_SHORT).show();
-                launchSignInActivity();
-                return;
-            }
-
-            Log.e("Login", "onSignInResult: ", response.getError());
-            finish();
-        }
     }
 }
