@@ -14,7 +14,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.das.euskadimov.Centro;
 import com.das.euskadimov.R;
+import com.das.euskadimov.databinding.ActivityUbicacionBinding;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 
@@ -27,8 +29,17 @@ import org.osmdroid.views.overlay.Marker;
 import android.content.Intent;
 
 public class UbicacionActivity extends AppCompatActivity {
+    enum LocationGrantedStatus {
+        UNKONW,
+        GRANTED,
+        DENIED
+    }
+
+    ActivityUbicacionBinding binding;
+
 
     private static final int CODIGO_PERMISO_UBICACION = 100;
+    private LocationGrantedStatus locationGrantedStatus;
 
     private MapView mapa;
     private Marker marcadorCentro;
@@ -36,24 +47,9 @@ public class UbicacionActivity extends AppCompatActivity {
 
     private FusedLocationProviderClient proveedorLocalizacion;
 
-    private String nombreCentro;
-    private String universidadCentro;
-    private String ciudadCentro;
-    private String direccionCentro;
-    private double latitudCentro;
-    private double longitudCentro;
-
+    private Centro centro;
     private GeoPoint puntoCentro;
     private GeoPoint puntoUsuario;
-
-    private TextView tvNombreCentro;
-    private TextView tvUniversidadCentro;
-    private TextView tvDireccionCentro;
-
-    private Button btnUsarMiUbicacion;
-    private Button btnUbicacionManual;
-    private Button btnEnfocarDestino;
-    private Button btnEnfocarUsuario;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,8 +59,8 @@ public class UbicacionActivity extends AppCompatActivity {
                 getApplicationContext(),
                 PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
         );
-
-        setContentView(R.layout.activity_ubicacion);
+        binding = ActivityUbicacionBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
         proveedorLocalizacion = LocationServices.getFusedLocationProviderClient(this);
 
@@ -76,49 +72,18 @@ public class UbicacionActivity extends AppCompatActivity {
     }
 
     private void recogerDatosCentro() {
-        nombreCentro = getIntent().getStringExtra("CENTRO_NOMBRE");
-        universidadCentro = getIntent().getStringExtra("CENTRO_UNIVERSIDAD");
-        ciudadCentro = getIntent().getStringExtra("CENTRO_CIUDAD");
-        direccionCentro = getIntent().getStringExtra("CENTRO_DIRECCION");
-        latitudCentro = getIntent().getDoubleExtra("CENTRO_LATITUD", 43.2630);
-        longitudCentro = getIntent().getDoubleExtra("CENTRO_LONGITUD", -2.9350);
-
-        if (nombreCentro == null) {
-            nombreCentro = "Centro seleccionado";
-        }
-
-        if (universidadCentro == null) {
-            universidadCentro = "Universidad no indicada";
-        }
-
-        if (ciudadCentro == null) {
-            ciudadCentro = "";
-        }
-
-        if (direccionCentro == null) {
-            direccionCentro = "";
-        }
-
-        puntoCentro = new GeoPoint(latitudCentro, longitudCentro);
+        centro = (Centro) getIntent().getSerializableExtra("CENTRO");
+        puntoCentro = new GeoPoint(centro.getLatitud(), centro.getLongitud());
     }
 
     private void enlazarVistas() {
-        tvNombreCentro = findViewById(R.id.tvNombreCentroUbicacion);
-        tvUniversidadCentro = findViewById(R.id.tvUniversidadCentroUbicacion);
-        tvDireccionCentro = findViewById(R.id.tvDireccionCentroUbicacion);
 
-        btnUsarMiUbicacion = findViewById(R.id.btnUsarMiUbicacion);
-        btnUbicacionManual = findViewById(R.id.btnUbicacionManual);
-        btnEnfocarDestino = findViewById(R.id.btnEnfocarDestino);
-        btnEnfocarUsuario = findViewById(R.id.btnEnfocarUsuario);
-
-        mapa = findViewById(R.id.mapaCentro);
     }
 
     private void mostrarDatosCentro() {
-        tvNombreCentro.setText(nombreCentro);
-        tvUniversidadCentro.setText(universidadCentro + " · " + ciudadCentro);
-        tvDireccionCentro.setText(direccionCentro);
+        binding.tvNombreCentroUbicacion.setText(centro.getNombre());
+        binding.tvUniversidadCentroUbicacion.setText(centro.getNombre() + " · " + centro.getCiudad());
+        binding.tvDireccionCentroUbicacion.setText(centro.getDireccion());
     }
 
     private void configurarMapa() {
@@ -132,8 +97,8 @@ public class UbicacionActivity extends AppCompatActivity {
         marcadorCentro = new Marker(mapa);
         marcadorCentro.setPosition(puntoCentro);
         marcadorCentro.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-        marcadorCentro.setTitle(nombreCentro);
-        marcadorCentro.setSubDescription(direccionCentro);
+        marcadorCentro.setTitle(centro.getNombre());
+        marcadorCentro.setSubDescription(centro.getDireccion());
 
         marcadorCentro.setOnMarkerClickListener((marker, mapView) -> {
             Toast.makeText(
@@ -150,13 +115,13 @@ public class UbicacionActivity extends AppCompatActivity {
     }
 
     private void configurarBotones() {
-        btnEnfocarDestino.setOnClickListener(v -> enfocarDestino());
+        binding.btnEnfocarDestino.setOnClickListener(v -> enfocarDestino());
 
-        btnEnfocarUsuario.setOnClickListener(v -> obtenerYEnfocarUbicacionActual());
+        binding.btnEnfocarUsuario.setOnClickListener(v -> obtenerYEnfocarUbicacionActual());
 
-        btnUsarMiUbicacion.setOnClickListener(v -> abrirResultadosRuta("actual"));
+        binding.btnUsarMiUbicacion.setOnClickListener(v -> abrirResultadosRuta("actual"));
 
-        btnUbicacionManual.setOnClickListener(v -> abrirResultadosRuta("manual"));
+        binding.btnUbicacionManual.setOnClickListener(v -> abrirResultadosRuta("manual"));
     }
 
     private void abrirResultadosRuta(String tipoOrigen) {

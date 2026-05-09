@@ -1,6 +1,8 @@
 package com.das.euskadimov;
 
-public class Centro {
+import java.io.Serializable;
+
+public class Centro implements Serializable {
 
     private int id;
     private String universidad;
