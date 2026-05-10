@@ -24,6 +24,7 @@ import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.overlay.Marker;
+import android.content.Intent;
 
 public class UbicacionActivity extends AppCompatActivity {
 
@@ -153,15 +154,23 @@ public class UbicacionActivity extends AppCompatActivity {
 
         btnEnfocarUsuario.setOnClickListener(v -> obtenerYEnfocarUbicacionActual());
 
-        btnUsarMiUbicacion.setOnClickListener(v -> obtenerYEnfocarUbicacionActual());
+        btnUsarMiUbicacion.setOnClickListener(v -> abrirResultadosRuta("actual"));
 
-        btnUbicacionManual.setOnClickListener(v ->
-                Toast.makeText(
-                        this,
-                        "Diselo Isaac Newton prrrrr",
-                        Toast.LENGTH_SHORT
-                ).show()
-        );
+        btnUbicacionManual.setOnClickListener(v -> abrirResultadosRuta("manual"));
+    }
+
+    private void abrirResultadosRuta(String tipoOrigen) {
+        Intent intent = new Intent(this, ResultadosRutaActivity.class);
+
+        intent.putExtra("CENTRO_NOMBRE", nombreCentro);
+        intent.putExtra("CENTRO_UNIVERSIDAD", universidadCentro);
+        intent.putExtra("CENTRO_CIUDAD", ciudadCentro);
+        intent.putExtra("CENTRO_DIRECCION", direccionCentro);
+        intent.putExtra("CENTRO_LATITUD", latitudCentro);
+        intent.putExtra("CENTRO_LONGITUD", longitudCentro);
+        intent.putExtra("TIPO_ORIGEN", tipoOrigen);
+
+        startActivity(intent);
     }
 
     private void enfocarDestino() {

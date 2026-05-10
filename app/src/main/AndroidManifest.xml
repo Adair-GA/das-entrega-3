@@ -31,6 +31,10 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".ui.activities.ResultadosRutaActivity"
+            android:exported="false" />
+
         <!-- Pantalla de Login (ya NO es inicio) -->
         <activity
             android:name=".ui.activities.MainActivity"
