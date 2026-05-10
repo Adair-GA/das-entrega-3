@@ -70,6 +70,16 @@ public class PerfilActivity extends AppCompatActivity {
         binding.btnGuardar.setOnClickListener(v -> guardarCambios());
         binding.rowCambiarPassword.setOnClickListener(v -> enviarEmailResetPassword());
         binding.rowCerrarSesion.setOnClickListener(v -> confirmarCerrarSesion());
+
+        // Navegar a favoritos
+        binding.rowFavoritos.setOnClickListener(v -> {
+            if (currentUser != null && !currentUser.isAnonymous()) {
+                startActivity(new Intent(this, FavoritosActivity.class));
+            } else {
+                Toast.makeText(this,
+                        "Inicia sesión para ver tus favoritos", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void guardarCambios() {

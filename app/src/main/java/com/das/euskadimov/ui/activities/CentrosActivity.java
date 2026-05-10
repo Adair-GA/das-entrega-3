@@ -11,6 +11,8 @@ import com.das.euskadimov.Centro;
 import com.das.euskadimov.R;
 import com.das.euskadimov.data.local.CentrosDbHelper;
 import com.das.euskadimov.ui.lists.adapters.CentroAdapter;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,9 +38,15 @@ public class CentrosActivity extends AppCompatActivity {
 
         listaCentros = centrosDbHelper.obtenerCentrosPorUniversidad(uniSeleccionada);
 
-        adapter = new CentroAdapter(listaCentros, centro -> {
-            Intent intent = new Intent(CentrosActivity.this, UbicacionActivity.class);
+        // Obtenemos el uid del usuario actual (null si es anónimo o no hay sesión)
+        FirebaseUser usuario = FirebaseAuth.getInstance().getCurrentUser();
+        String uid = null;
+        if (usuario != null && !usuario.isAnonymous()) {
+            uid = usuario.getUid();
+        }
 
+        adapter = new CentroAdapter(listaCentros, uid, centro -> {
+            Intent intent = new Intent(CentrosActivity.this, UbicacionActivity.class);
             intent.putExtra("CENTRO_ID", centro.getId());
             intent.putExtra("CENTRO_NOMBRE", centro.getNombre());
             intent.putExtra("CENTRO_UNIVERSIDAD", centro.getUniversidad());
@@ -46,7 +54,6 @@ public class CentrosActivity extends AppCompatActivity {
             intent.putExtra("CENTRO_DIRECCION", centro.getDireccion());
             intent.putExtra("CENTRO_LATITUD", centro.getLatitud());
             intent.putExtra("CENTRO_LONGITUD", centro.getLongitud());
-
             startActivity(intent);
         });
 
