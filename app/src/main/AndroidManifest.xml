@@ -52,9 +52,9 @@
             android:exported="false" />
 
         <!-- Perfil -->
-<!--        <activity-->
-<!--            android:name=".PerfilActivity"-->
-<!--            android:exported="false" />-->
+        <activity
+            android:name=".ui.activities.PerfilActivity"
+            android:exported="false" />
 
     </application>
 

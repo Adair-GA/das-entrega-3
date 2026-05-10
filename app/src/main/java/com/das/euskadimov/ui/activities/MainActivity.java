@@ -40,6 +40,19 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.cardDeusto).setOnClickListener(v -> openCentros("Deusto"));
         findViewById(R.id.cardEHU).setOnClickListener(v -> openCentros("EHU"));
         findViewById(R.id.cardMondragon).setOnClickListener(v -> openCentros("Mondragon"));
+
+        android.widget.TextView tvInitials = findViewById(R.id.tvToolbarInitials);
+        tvInitials.setOnClickListener(v -> startActivity(new Intent(this, PerfilActivity.class)));
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            String email = user.getEmail();
+            // Usuario anónimo no tiene email
+            String inicial = (email != null && !email.isEmpty())
+                    ? email.substring(0, 1).toUpperCase()
+                    : "?";
+            tvInitials.setText(inicial);
+        }
     }
 
     private void openCentros(String uniName) {
