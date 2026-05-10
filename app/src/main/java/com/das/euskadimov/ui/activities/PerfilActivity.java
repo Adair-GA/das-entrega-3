@@ -50,11 +50,26 @@ public class PerfilActivity extends AppCompatActivity {
         DocumentReference ref = db.collection("usuarios").document(currentUser.getUid());
         ref.get()
                 .addOnSuccessListener(snapshot -> {
-                    if (!snapshot.exists()) return;
+                    String nombre = null;
 
-                    String nombre = snapshot.getString("nombre");
+                    if (snapshot.exists()) {
+                        nombre = snapshot.getString("nombre");
+                    }
 
-                    if (nombre != null) {
+                    // Fallback: si Firestore no tiene el nombre, usar displayName de Auth
+                    // (usuarios registrados antes de que se guardara en Firestore)
+                    if (nombre == null || nombre.isEmpty()) {
+                        String displayName = currentUser.getDisplayName();
+                        if (displayName != null && !displayName.isEmpty()) {
+                            nombre = displayName;
+                            // Aprovechamos para sincronizarlo en Firestore
+                            Map<String, Object> datos = new HashMap<>();
+                            datos.put("nombre", nombre);
+                            ref.set(datos, SetOptions.merge());
+                        }
+                    }
+
+                    if (nombre != null && !nombre.isEmpty()) {
                         binding.tvName.setText(nombre);
                         binding.etNombre.setText(nombre);
                         binding.etNombre.setSelection(nombre.length());
@@ -71,7 +86,6 @@ public class PerfilActivity extends AppCompatActivity {
         binding.rowCambiarPassword.setOnClickListener(v -> enviarEmailResetPassword());
         binding.rowCerrarSesion.setOnClickListener(v -> confirmarCerrarSesion());
 
-        // Navegar a favoritos
         binding.rowFavoritos.setOnClickListener(v -> {
             if (currentUser != null && !currentUser.isAnonymous()) {
                 startActivity(new Intent(this, FavoritosActivity.class));
