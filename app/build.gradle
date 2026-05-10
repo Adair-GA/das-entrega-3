@@ -5,11 +5,7 @@ plugins {
 
 android {
     namespace 'com.das.euskadimov'
-    compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
-    }
+    compileSdk 36
 
     defaultConfig {
         applicationId "com.das.euskadimov"
@@ -27,10 +23,12 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
     }
+
     buildFeatures {
         viewBinding true
     }
@@ -38,20 +36,30 @@ android {
 
 dependencies {
     implementation 'com.google.android.gms:play-services-location:21.3.0'
-    implementation ('org.osmdroid:osmdroid-android:6.1.16'){
+
+    implementation ('org.osmdroid:osmdroid-android:6.1.16') {
         exclude group: 'com.j256.ormlite', module: 'ormlite-core'
     }
-    implementation ('org.osmdroid:osmdroid-wms:6.1.16'){
+
+    implementation ('org.osmdroid:osmdroid-wms:6.1.16') {
         exclude group: 'com.j256.ormlite', module: 'ormlite-core'
     }
-    implementation ('org.osmdroid:osmdroid-mapsforge:6.1.16'){
+
+    implementation ('org.osmdroid:osmdroid-mapsforge:6.1.16') {
         exclude group: 'com.j256.ormlite', module: 'ormlite-core'
     }
+
     implementation ('org.osmdroid:osmdroid-geopackage:6.1.16') {
         exclude group: 'com.j256.ormlite', module: 'ormlite-core'
     }
-    implementation 'com.google.firebase:firebase-firestore:25.1.4'
-    implementation 'com.google.firebase:firebase-storage:21.0.2'
+
+    // Firebase
+    implementation platform('com.google.firebase:firebase-bom:33.7.0')
+    implementation 'com.google.firebase:firebase-auth'
+    implementation 'com.google.firebase:firebase-firestore'
+    implementation 'com.google.firebase:firebase-storage'
+
+    // Glide
     implementation 'com.github.bumptech.glide:glide:4.16.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.16.0'
 
@@ -60,11 +68,10 @@ dependencies {
     implementation libs.constraintlayout
     implementation libs.navigation.fragment
     implementation libs.navigation.ui
-    implementation libs.firebase.auth
     implementation libs.credentials
     implementation libs.credentials.play.services.auth
-    implementation(libs.firebase.ui.auth)
     implementation libs.googleid
+
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core

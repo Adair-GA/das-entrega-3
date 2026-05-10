@@ -78,14 +78,14 @@ public class RegisterActivity extends AppCompatActivity {
         }
 
         btnRegister.setEnabled(false);
+        Toast.makeText(this, "Registrando cuenta...", Toast.LENGTH_SHORT).show();
 
         mAuth.createUserWithEmailAndPassword(email, pass)
                 .addOnCompleteListener(this, task -> {
                     if (!task.isSuccessful()) {
                         btnRegister.setEnabled(true);
                         String mensaje = "Error al registrar usuario";
-                        if (task.getException() != null
-                                && task.getException().getMessage() != null) {
+                        if (task.getException() != null && task.getException().getMessage() != null) {
                             mensaje = task.getException().getMessage();
                         }
                         Toast.makeText(this, mensaje, Toast.LENGTH_LONG).show();
@@ -94,22 +94,18 @@ public class RegisterActivity extends AppCompatActivity {
 
                     FirebaseUser usuario = mAuth.getCurrentUser();
                     if (usuario == null) {
-                        // No debería pasar, pero por si acaso
                         abrirPantallaPrincipal();
                         return;
                     }
 
-                    // 1. Actualizar displayName en Auth, encadenado correctamente
                     UserProfileChangeRequest perfilRequest = new UserProfileChangeRequest.Builder()
                             .setDisplayName(name)
                             .build();
 
                     usuario.updateProfile(perfilRequest)
-                            .addOnCompleteListener(this, profileTask -> {
-                                // 2. Tanto si updateProfile va bien como si falla,
-                                //    guardamos en Firestore y navegamos
-                                guardarEnFirestoreYNavegar(usuario.getUid(), name, email);
-                            });
+                            .addOnCompleteListener(this, profileTask ->
+                                    guardarEnFirestoreYNavegar(usuario.getUid(), name, email)
+                            );
                 });
     }
 
@@ -122,19 +118,17 @@ public class RegisterActivity extends AppCompatActivity {
                 .document(uid)
                 .set(datos)
                 .addOnCompleteListener(this, task -> {
-                    // Navegar siempre, haya ido bien o mal Firestore
                     if (!task.isSuccessful()) {
-                        Toast.makeText(this,
-                                "Cuenta creada, pero no se pudo guardar el perfil",
-                                Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Error al guardar el perfil", Toast.LENGTH_SHORT).show();
                     }
                     abrirPantallaPrincipal();
                 });
     }
 
     private void abrirPantallaPrincipal() {
-        Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        Toast.makeText(this, "¡Cuenta creada con éxito! 🎉", Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
     }
