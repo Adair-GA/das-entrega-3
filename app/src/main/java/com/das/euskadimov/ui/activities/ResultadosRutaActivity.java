@@ -99,10 +99,7 @@ public class ResultadosRutaActivity extends AppCompatActivity {
         rvRutas.setAdapter(adapter);
     }
 
-    /*
-     * Este método es provisional.
-     * Cuando llegue el servicio real, solo habrá que sustituir esta lista por los datos recibidos.
-     */
+
     private List<RutaResultado> crearRutasDeEjemplo() {
         List<RutaResultado> rutas = new ArrayList<>();
 
@@ -154,10 +151,7 @@ public class ResultadosRutaActivity extends AppCompatActivity {
         intent.putExtra("CENTRO_LATITUD", latitudCentro);
         intent.putExtra("CENTRO_LONGITUD", longitudCentro);
 
-        /*
-         * Estos extras quedan preparados para el futuro.
-         * Cuando se implemente pintar la ruta, UbicacionActivity podrá leerlos.
-         */
+
         intent.putExtra("MOSTRAR_RUTA", true);
         intent.putExtra("RUTA_ID", ruta.getId());
 
