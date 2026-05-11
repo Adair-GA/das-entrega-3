@@ -3,6 +3,7 @@ package com.das.euskadimov.ui.activities;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,10 +13,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.das.euskadimov.R;
 import com.das.euskadimov.RutaResultado;
 import com.das.euskadimov.TramoRuta;
+import com.das.euskadimov.data.local.TripPatternHelper;
 import com.das.euskadimov.data.remote.OtpClient;
 import com.das.euskadimov.ui.lists.adapters.RutaResultadoAdapter;
 import com.graphql.WalkingTripQuery;
 import com.graphql.type.Leg;
+
+import org.osmdroid.util.GeoPoint;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +40,9 @@ public class ResultadosRutaActivity extends AppCompatActivity {
     private int centroId;
     private double latitudCentro;
     private double longitudCentro;
+
+    private List<RutaResultado> processedRoutes;
+    private List<WalkingTripQuery.TripPattern> tripPatterns;
 
     private Location originLocation;
 
@@ -110,14 +117,14 @@ public class ResultadosRutaActivity extends AppCompatActivity {
                 rutas.add(parseRoute(pattern, i));
                 i++;
             }
+            tripPatterns = patterns;
+            this.processedRoutes = rutas;
             runOnUiThread(() -> {
                 adapter.setRutas(rutas);
                 adapter.notifyDataSetChanged();
             });
 
         });
-
-//        List<RutaResultado> rutas = crearRutasDeEjemplo(); //Aqui enganchar el servicio
 
         adapter = new RutaResultadoAdapter(new ArrayList<>(), ruta -> abrirRutaEnMapa(ruta));
         rvRutas.setAdapter(adapter);
@@ -255,20 +262,19 @@ public class ResultadosRutaActivity extends AppCompatActivity {
 
 
     private void abrirRutaEnMapa(RutaResultado ruta) {
-        Intent intent = new Intent(this, UbicacionActivity.class);
+        GeoPoint start = new GeoPoint(originLocation.getLatitude(), originLocation.getLongitude());
+        GeoPoint end = new GeoPoint(latitudCentro, longitudCentro);
 
-        intent.putExtra("CENTRO_ID", centroId);
-        intent.putExtra("CENTRO_NOMBRE", nombreCentro);
-        intent.putExtra("CENTRO_UNIVERSIDAD", universidadCentro);
-        intent.putExtra("CENTRO_CIUDAD", ciudadCentro);
-        intent.putExtra("CENTRO_DIRECCION", direccionCentro);
-        intent.putExtra("CENTRO_LATITUD", latitudCentro);
-        intent.putExtra("CENTRO_LONGITUD", longitudCentro);
+        int index = processedRoutes.indexOf(ruta);
+
+        WalkingTripQuery.TripPattern pattern = tripPatterns.get(index);
 
 
-        intent.putExtra("MOSTRAR_RUTA", true);
-        intent.putExtra("RUTA_ID", ruta.getId());
-
+        Intent intent = new Intent(this, ShowRouteActivity.class);
+        intent.putExtra("START", (Parcelable) start);
+        intent.putExtra("END", (Parcelable) end);
+        TripPatternHelper.getInstance().setLastPattern(pattern);
         startActivity(intent);
+
     }
 }

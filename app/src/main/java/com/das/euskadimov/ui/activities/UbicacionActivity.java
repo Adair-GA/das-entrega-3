@@ -126,7 +126,7 @@ public class UbicacionActivity extends AppCompatActivity {
 
         binding.btnUsarMiUbicacion.setOnClickListener(v -> abrirResultadosRuta("actual"));
 
-        binding.btnUbicacionManual.setOnClickListener(v -> abrirResultadosRuta("manual"));
+//        binding.btnUbicacionManual.setOnClickListener(v -> abrirResultadosRuta("manual"));
     }
 
     private void abrirResultadosRuta(String tipoOrigen) {
