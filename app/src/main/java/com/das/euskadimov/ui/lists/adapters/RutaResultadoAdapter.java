@@ -30,6 +30,10 @@ public class RutaResultadoAdapter extends RecyclerView.Adapter<RutaResultadoAdap
         this.listener = listener;
     }
 
+    public void setRutas(List<RutaResultado> rutas) {
+        this.rutas = rutas;
+    }
+
     @NonNull
     @Override
     public RutaViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

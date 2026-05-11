@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 
@@ -16,7 +17,11 @@ import com.das.euskadimov.R;
 import com.das.euskadimov.databinding.ActivityUbicacionBinding;
 import com.das.euskadimov.model.Centro;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.Priority;
 
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
@@ -24,9 +29,13 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
+
 import android.content.Intent;
 
 public class UbicacionActivity extends AppCompatActivity {
+
+    private LocationCallback locationCallback;
+
     enum LocationGrantedStatus {
         UNKONW,
         GRANTED,
@@ -48,6 +57,7 @@ public class UbicacionActivity extends AppCompatActivity {
     private Centro centro;
     private GeoPoint puntoCentro;
     private GeoPoint puntoUsuario;
+    private Location currentLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +72,7 @@ public class UbicacionActivity extends AppCompatActivity {
 
         proveedorLocalizacion = LocationServices.getFusedLocationProviderClient(this);
 
+
         recogerDatosCentro();
         mapa = binding.mapaCentro;
         mostrarDatosCentro();
@@ -72,10 +83,6 @@ public class UbicacionActivity extends AppCompatActivity {
     private void recogerDatosCentro() {
         centro = (Centro) getIntent().getSerializableExtra("CENTRO");
         puntoCentro = new GeoPoint(centro.getLatitud(), centro.getLongitud());
-    }
-
-    private void enlazarVistas() {
-
     }
 
     private void mostrarDatosCentro() {
@@ -125,6 +132,14 @@ public class UbicacionActivity extends AppCompatActivity {
     private void abrirResultadosRuta(String tipoOrigen) {
         Intent intent = new Intent(this, ResultadosRutaActivity.class);
 
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        proveedorLocalizacion.getLastLocation().addOnSuccessListener(location -> {
+            this.currentLocation = location;
+            startActivity(intent);
+        });
+
         intent.putExtra("CENTRO_NOMBRE", centro.getNombre());
         intent.putExtra("CENTRO_UNIVERSIDAD", centro.getUniversidad());
         intent.putExtra("CENTRO_CIUDAD", centro.getCiudad());
@@ -132,8 +147,8 @@ public class UbicacionActivity extends AppCompatActivity {
         intent.putExtra("CENTRO_LATITUD", centro.getLatitud());
         intent.putExtra("CENTRO_LONGITUD", centro.getLongitud());
         intent.putExtra("TIPO_ORIGEN", tipoOrigen);
+        intent.putExtra("LOCATION", currentLocation);
 
-        startActivity(intent);
     }
 
     private void enfocarDestino() {
@@ -179,6 +194,17 @@ public class UbicacionActivity extends AppCompatActivity {
                                 Toast.LENGTH_SHORT
                         ).show()
                 );
+        var locationRequest = new LocationRequest.Builder(Priority.PRIORITY_BALANCED_POWER_ACCURACY, 5000).build();
+
+        locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(@NonNull LocationResult locationResult) {
+                super.onLocationResult(locationResult);
+                UbicacionActivity.this.currentLocation = locationResult.getLastLocation();
+            }
+        };
+
+        proveedorLocalizacion.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
     }
 
     private void actualizarMarcadorUsuario(Location location) {
@@ -223,6 +249,10 @@ public class UbicacionActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        if (locationCallback == null) {
+            obtenerUltimaUbicacion();
+        }
+
 
         if (mapa != null) {
             mapa.onResume();
@@ -233,6 +263,7 @@ public class UbicacionActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
 
+        proveedorLocalizacion.removeLocationUpdates(locationCallback);
         if (mapa != null) {
             mapa.onPause();
         }
