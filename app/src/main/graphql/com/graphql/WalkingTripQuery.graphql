@@ -1,0 +1,48 @@
+query WalkingTripQuery($origLat: Float!, $origLon: Float!, $destLat: Float!, $destLon: Float!) {
+    trip(
+        from: {
+            coordinates: {
+                latitude: $origLat
+                longitude: $origLon
+            }
+        }
+        to: {
+            coordinates: {
+                latitude: $destLat
+                longitude: $destLon
+            }
+        }
+    ) {
+        tripPatterns {
+            expectedStartTime
+            expectedEndTime
+            legs {
+                mode
+                expectedStartTime
+                expectedEndTime
+                duration
+                distance
+                toPlace {
+                    name
+                }
+                fromPlace {
+                    name
+                }
+                pointsOnLink {
+                    length
+                    points
+                }
+                line {
+                    presentation {
+                        colour
+                    }
+                    authority {
+                        name
+                    }
+                    publicCode
+                    name
+                }
+            }
+        }
+    }
+}

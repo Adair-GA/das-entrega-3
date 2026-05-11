@@ -65,16 +65,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical" />
 
-        <TextView
-            android:id="@+id/tvCosteRuta"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:gravity="end"
-            android:text="Coste generalizado: €1661"
-            android:textColor="#111827"
-            android:textSize="12sp" />
-
         <Button
             android:id="@+id/btnVerRutaMapa"
             android:layout_width="match_parent"

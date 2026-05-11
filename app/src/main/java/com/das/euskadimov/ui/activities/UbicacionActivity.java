@@ -4,9 +4,8 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Looper;
 import android.preference.PreferenceManager;
-import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -15,20 +14,39 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.das.euskadimov.R;
+import com.das.euskadimov.databinding.ActivityUbicacionBinding;
+import com.das.euskadimov.model.Centro;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.Priority;
 
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapView;
-import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.overlay.Marker;
+
 import android.content.Intent;
 
 public class UbicacionActivity extends AppCompatActivity {
 
+    private LocationCallback locationCallback;
+
+    enum LocationGrantedStatus {
+        UNKONW,
+        GRANTED,
+        DENIED
+    }
+
+    ActivityUbicacionBinding binding;
+
+
     private static final int CODIGO_PERMISO_UBICACION = 100;
+    private LocationGrantedStatus locationGrantedStatus;
 
     private MapView mapa;
     private Marker marcadorCentro;
@@ -36,24 +54,10 @@ public class UbicacionActivity extends AppCompatActivity {
 
     private FusedLocationProviderClient proveedorLocalizacion;
 
-    private String nombreCentro;
-    private String universidadCentro;
-    private String ciudadCentro;
-    private String direccionCentro;
-    private double latitudCentro;
-    private double longitudCentro;
-
+    private Centro centro;
     private GeoPoint puntoCentro;
     private GeoPoint puntoUsuario;
-
-    private TextView tvNombreCentro;
-    private TextView tvUniversidadCentro;
-    private TextView tvDireccionCentro;
-
-    private Button btnUsarMiUbicacion;
-    private Button btnUbicacionManual;
-    private Button btnEnfocarDestino;
-    private Button btnEnfocarUsuario;
+    private Location currentLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,62 +67,28 @@ public class UbicacionActivity extends AppCompatActivity {
                 getApplicationContext(),
                 PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
         );
-
-        setContentView(R.layout.activity_ubicacion);
+        binding = ActivityUbicacionBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
         proveedorLocalizacion = LocationServices.getFusedLocationProviderClient(this);
 
+
         recogerDatosCentro();
-        enlazarVistas();
+        mapa = binding.mapaCentro;
         mostrarDatosCentro();
         configurarMapa();
         configurarBotones();
     }
 
     private void recogerDatosCentro() {
-        nombreCentro = getIntent().getStringExtra("CENTRO_NOMBRE");
-        universidadCentro = getIntent().getStringExtra("CENTRO_UNIVERSIDAD");
-        ciudadCentro = getIntent().getStringExtra("CENTRO_CIUDAD");
-        direccionCentro = getIntent().getStringExtra("CENTRO_DIRECCION");
-        latitudCentro = getIntent().getDoubleExtra("CENTRO_LATITUD", 43.2630);
-        longitudCentro = getIntent().getDoubleExtra("CENTRO_LONGITUD", -2.9350);
-
-        if (nombreCentro == null) {
-            nombreCentro = "Centro seleccionado";
-        }
-
-        if (universidadCentro == null) {
-            universidadCentro = "Universidad no indicada";
-        }
-
-        if (ciudadCentro == null) {
-            ciudadCentro = "";
-        }
-
-        if (direccionCentro == null) {
-            direccionCentro = "";
-        }
-
-        puntoCentro = new GeoPoint(latitudCentro, longitudCentro);
-    }
-
-    private void enlazarVistas() {
-        tvNombreCentro = findViewById(R.id.tvNombreCentroUbicacion);
-        tvUniversidadCentro = findViewById(R.id.tvUniversidadCentroUbicacion);
-        tvDireccionCentro = findViewById(R.id.tvDireccionCentroUbicacion);
-
-        btnUsarMiUbicacion = findViewById(R.id.btnUsarMiUbicacion);
-        btnUbicacionManual = findViewById(R.id.btnUbicacionManual);
-        btnEnfocarDestino = findViewById(R.id.btnEnfocarDestino);
-        btnEnfocarUsuario = findViewById(R.id.btnEnfocarUsuario);
-
-        mapa = findViewById(R.id.mapaCentro);
+        centro = (Centro) getIntent().getSerializableExtra("CENTRO");
+        puntoCentro = new GeoPoint(centro.getLatitud(), centro.getLongitud());
     }
 
     private void mostrarDatosCentro() {
-        tvNombreCentro.setText(nombreCentro);
-        tvUniversidadCentro.setText(universidadCentro + " · " + ciudadCentro);
-        tvDireccionCentro.setText(direccionCentro);
+        binding.tvNombreCentroUbicacion.setText(centro.getNombre());
+        binding.tvUniversidadCentroUbicacion.setText(centro.getNombre() + " · " + centro.getCiudad());
+        binding.tvDireccionCentroUbicacion.setText(centro.getDireccion());
     }
 
     private void configurarMapa() {
@@ -132,8 +102,8 @@ public class UbicacionActivity extends AppCompatActivity {
         marcadorCentro = new Marker(mapa);
         marcadorCentro.setPosition(puntoCentro);
         marcadorCentro.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-        marcadorCentro.setTitle(nombreCentro);
-        marcadorCentro.setSubDescription(direccionCentro);
+        marcadorCentro.setTitle(centro.getNombre());
+        marcadorCentro.setSubDescription(centro.getDireccion());
 
         marcadorCentro.setOnMarkerClickListener((marker, mapView) -> {
             Toast.makeText(
@@ -150,27 +120,35 @@ public class UbicacionActivity extends AppCompatActivity {
     }
 
     private void configurarBotones() {
-        btnEnfocarDestino.setOnClickListener(v -> enfocarDestino());
+        binding.btnEnfocarDestino.setOnClickListener(v -> enfocarDestino());
 
-        btnEnfocarUsuario.setOnClickListener(v -> obtenerYEnfocarUbicacionActual());
+        binding.btnEnfocarUsuario.setOnClickListener(v -> obtenerYEnfocarUbicacionActual());
 
-        btnUsarMiUbicacion.setOnClickListener(v -> abrirResultadosRuta("actual"));
+        binding.btnUsarMiUbicacion.setOnClickListener(v -> abrirResultadosRuta("actual"));
 
-        btnUbicacionManual.setOnClickListener(v -> abrirResultadosRuta("manual"));
+//        binding.btnUbicacionManual.setOnClickListener(v -> abrirResultadosRuta("manual"));
     }
 
     private void abrirResultadosRuta(String tipoOrigen) {
         Intent intent = new Intent(this, ResultadosRutaActivity.class);
 
-        intent.putExtra("CENTRO_NOMBRE", nombreCentro);
-        intent.putExtra("CENTRO_UNIVERSIDAD", universidadCentro);
-        intent.putExtra("CENTRO_CIUDAD", ciudadCentro);
-        intent.putExtra("CENTRO_DIRECCION", direccionCentro);
-        intent.putExtra("CENTRO_LATITUD", latitudCentro);
-        intent.putExtra("CENTRO_LONGITUD", longitudCentro);
-        intent.putExtra("TIPO_ORIGEN", tipoOrigen);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        proveedorLocalizacion.getLastLocation().addOnSuccessListener(location -> {
+            this.currentLocation = location;
+            startActivity(intent);
+        });
 
-        startActivity(intent);
+        intent.putExtra("CENTRO_NOMBRE", centro.getNombre());
+        intent.putExtra("CENTRO_UNIVERSIDAD", centro.getUniversidad());
+        intent.putExtra("CENTRO_CIUDAD", centro.getCiudad());
+        intent.putExtra("CENTRO_DIRECCION", centro.getDireccion());
+        intent.putExtra("CENTRO_LATITUD", centro.getLatitud());
+        intent.putExtra("CENTRO_LONGITUD", centro.getLongitud());
+        intent.putExtra("TIPO_ORIGEN", tipoOrigen);
+        intent.putExtra("LOCATION", currentLocation);
+
     }
 
     private void enfocarDestino() {
@@ -216,6 +194,17 @@ public class UbicacionActivity extends AppCompatActivity {
                                 Toast.LENGTH_SHORT
                         ).show()
                 );
+        var locationRequest = new LocationRequest.Builder(Priority.PRIORITY_BALANCED_POWER_ACCURACY, 5000).build();
+
+        locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(@NonNull LocationResult locationResult) {
+                super.onLocationResult(locationResult);
+                UbicacionActivity.this.currentLocation = locationResult.getLastLocation();
+            }
+        };
+
+        proveedorLocalizacion.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
     }
 
     private void actualizarMarcadorUsuario(Location location) {
@@ -260,6 +249,10 @@ public class UbicacionActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        if (locationCallback == null) {
+            obtenerUltimaUbicacion();
+        }
+
 
         if (mapa != null) {
             mapa.onResume();
@@ -270,6 +263,7 @@ public class UbicacionActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
 
+        proveedorLocalizacion.removeLocationUpdates(locationCallback);
         if (mapa != null) {
             mapa.onPause();
         }

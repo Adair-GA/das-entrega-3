@@ -7,7 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.das.euskadimov.Centro;
+import com.das.euskadimov.model.Centro;
 import com.das.euskadimov.R;
 import com.das.euskadimov.data.local.CentrosDbHelper;
 import com.das.euskadimov.ui.lists.adapters.CentroAdapter;
@@ -47,13 +47,7 @@ public class CentrosActivity extends AppCompatActivity {
 
         adapter = new CentroAdapter(listaCentros, uid, centro -> {
             Intent intent = new Intent(CentrosActivity.this, UbicacionActivity.class);
-            intent.putExtra("CENTRO_ID", centro.getId());
-            intent.putExtra("CENTRO_NOMBRE", centro.getNombre());
-            intent.putExtra("CENTRO_UNIVERSIDAD", centro.getUniversidad());
-            intent.putExtra("CENTRO_CIUDAD", centro.getCiudad());
-            intent.putExtra("CENTRO_DIRECCION", centro.getDireccion());
-            intent.putExtra("CENTRO_LATITUD", centro.getLatitud());
-            intent.putExtra("CENTRO_LONGITUD", centro.getLongitud());
+            intent.putExtra("CENTRO", centro);
             startActivity(intent);
         });
 

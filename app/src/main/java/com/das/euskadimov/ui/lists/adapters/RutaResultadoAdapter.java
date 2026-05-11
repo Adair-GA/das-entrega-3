@@ -30,6 +30,10 @@ public class RutaResultadoAdapter extends RecyclerView.Adapter<RutaResultadoAdap
         this.listener = listener;
     }
 
+    public void setRutas(List<RutaResultado> rutas) {
+        this.rutas = rutas;
+    }
+
     @NonNull
     @Override
     public RutaViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -44,7 +48,6 @@ public class RutaResultadoAdapter extends RecyclerView.Adapter<RutaResultadoAdap
 
         holder.tvNumeroRuta.setText((position + 1) + ".");
         holder.tvResumenRuta.setText(ruta.getHoraInicio() + "   " + ruta.getResumen() + "   " + ruta.getHoraFin());
-        holder.tvCosteRuta.setText("Coste generalizado: " + ruta.getCosteGeneralizado());
 
         if (ruta.isDesplegada()) {
             holder.layoutDetalleRuta.setVisibility(View.VISIBLE);
@@ -66,7 +69,7 @@ public class RutaResultadoAdapter extends RecyclerView.Adapter<RutaResultadoAdap
             TextView tvDescripcion = tramoView.findViewById(R.id.tvTramoDescripcion);
 
             tvHorario.setText(tramo.getHoraInicio() + " - " + tramo.getHoraFin());
-            tvDistancia.setText(tramo.getDistancia() + ", " + tramo.getDuracion() + ", " + tramo.getCoste());
+            tvDistancia.setText(tramo.getDistancia() + ", " + tramo.getDuracion());
             tvTipo.setText(tramo.getTipo());
             tvDescripcion.setText(tramo.getDescripcion());
 
@@ -99,7 +102,6 @@ public class RutaResultadoAdapter extends RecyclerView.Adapter<RutaResultadoAdap
         TextView tvNumeroRuta;
         TextView tvResumenRuta;
         TextView tvFlechaRuta;
-        TextView tvCosteRuta;
         Button btnVerRutaMapa;
 
         public RutaViewHolder(@NonNull View itemView) {
@@ -111,7 +113,6 @@ public class RutaResultadoAdapter extends RecyclerView.Adapter<RutaResultadoAdap
             tvNumeroRuta = itemView.findViewById(R.id.tvNumeroRuta);
             tvResumenRuta = itemView.findViewById(R.id.tvResumenRuta);
             tvFlechaRuta = itemView.findViewById(R.id.tvFlechaRuta);
-            tvCosteRuta = itemView.findViewById(R.id.tvCosteRuta);
             btnVerRutaMapa = itemView.findViewById(R.id.btnVerRutaMapa);
         }
     }
