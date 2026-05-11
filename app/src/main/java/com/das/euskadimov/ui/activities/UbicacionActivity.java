@@ -78,6 +78,8 @@ public class UbicacionActivity extends AppCompatActivity {
         mostrarDatosCentro();
         configurarMapa();
         configurarBotones();
+
+        obtenerYEnfocarUbicacionActual();
     }
 
     private void recogerDatosCentro() {
@@ -125,6 +127,8 @@ public class UbicacionActivity extends AppCompatActivity {
         binding.btnEnfocarUsuario.setOnClickListener(v -> obtenerYEnfocarUbicacionActual());
 
         binding.btnUsarMiUbicacion.setOnClickListener(v -> abrirResultadosRuta("actual"));
+        binding.btnUsarMiUbicacion.setEnabled(false);
+
 
 //        binding.btnUbicacionManual.setOnClickListener(v -> abrirResultadosRuta("manual"));
     }
@@ -177,6 +181,7 @@ public class UbicacionActivity extends AppCompatActivity {
 
         proveedorLocalizacion.getLastLocation()
                 .addOnSuccessListener(this, location -> {
+                    binding.btnUsarMiUbicacion.setEnabled(true);
                     if (location != null) {
                         actualizarMarcadorUsuario(location);
                     } else {
@@ -236,12 +241,15 @@ public class UbicacionActivity extends AppCompatActivity {
             if (grantResults.length > 0
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 obtenerUltimaUbicacion();
+                locationGrantedStatus = LocationGrantedStatus.GRANTED;
             } else {
                 Toast.makeText(
                         this,
                         "Sin permiso de ubicación no se puede centrar el mapa en tu posición",
                         Toast.LENGTH_LONG
                 ).show();
+                locationGrantedStatus = LocationGrantedStatus.DENIED;
+                binding.btnUsarMiUbicacion.setEnabled(false);
             }
         }
     }
@@ -263,7 +271,9 @@ public class UbicacionActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
 
-        proveedorLocalizacion.removeLocationUpdates(locationCallback);
+        if (locationCallback != null) {
+            proveedorLocalizacion.removeLocationUpdates(locationCallback);
+        }
         if (mapa != null) {
             mapa.onPause();
         }
