@@ -197,7 +197,10 @@ public class ResultadosRutaActivity extends AppCompatActivity {
                 descripcion = leg.getFromPlace().getName() + "→" + leg.getToPlace().getName();
                 break;
             case bus:
-                descripcion = String.format("%s (%s) \n %s → %s",leg.getLine().getName(), leg.getLine().getPublicCode(), leg.getFromPlace().getName(),leg.getToPlace().getName());
+                descripcion = String.format("%s (%s) \n %s → %s", leg.getLine().getName(), leg.getLine().getPublicCode(), leg.getFromPlace().getName(), leg.getToPlace().getName());
+                break;
+            case bicycle:
+                descripcion = "Ir en bici desde " + leg.getFromPlace().getName() + " hasta " + leg.getToPlace().getName();
                 break;
             default:
                 throw new RuntimeException("Not supported mode: " + leg.getMode().name());
@@ -232,6 +235,9 @@ public class ResultadosRutaActivity extends AppCompatActivity {
                     break;
                 case bus:
                     resumen.append("🚌");
+                    break;
+                case bicycle:
+                    resumen.append("🚲");
                     break;
 
             }
