@@ -5,8 +5,6 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -14,17 +12,17 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import com.das.euskadimov.Centro;
 import com.das.euskadimov.R;
 import com.das.euskadimov.databinding.ActivityUbicacionBinding;
+import com.das.euskadimov.model.Centro;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapView;
-import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.overlay.Marker;
 import android.content.Intent;
 
@@ -65,7 +63,7 @@ public class UbicacionActivity extends AppCompatActivity {
         proveedorLocalizacion = LocationServices.getFusedLocationProviderClient(this);
 
         recogerDatosCentro();
-        enlazarVistas();
+        mapa = binding.mapaCentro;
         mostrarDatosCentro();
         configurarMapa();
         configurarBotones();
@@ -127,12 +125,12 @@ public class UbicacionActivity extends AppCompatActivity {
     private void abrirResultadosRuta(String tipoOrigen) {
         Intent intent = new Intent(this, ResultadosRutaActivity.class);
 
-        intent.putExtra("CENTRO_NOMBRE", nombreCentro);
-        intent.putExtra("CENTRO_UNIVERSIDAD", universidadCentro);
-        intent.putExtra("CENTRO_CIUDAD", ciudadCentro);
-        intent.putExtra("CENTRO_DIRECCION", direccionCentro);
-        intent.putExtra("CENTRO_LATITUD", latitudCentro);
-        intent.putExtra("CENTRO_LONGITUD", longitudCentro);
+        intent.putExtra("CENTRO_NOMBRE", centro.getNombre());
+        intent.putExtra("CENTRO_UNIVERSIDAD", centro.getUniversidad());
+        intent.putExtra("CENTRO_CIUDAD", centro.getCiudad());
+        intent.putExtra("CENTRO_DIRECCION", centro.getDireccion());
+        intent.putExtra("CENTRO_LATITUD", centro.getLatitud());
+        intent.putExtra("CENTRO_LONGITUD", centro.getLongitud());
         intent.putExtra("TIPO_ORIGEN", tipoOrigen);
 
         startActivity(intent);

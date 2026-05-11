@@ -7,7 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.das.euskadimov.Centro;
+import com.das.euskadimov.model.Centro;
 import com.das.euskadimov.R;
 import com.das.euskadimov.data.local.CentrosDbHelper;
 import com.das.euskadimov.ui.lists.adapters.CentroAdapter;

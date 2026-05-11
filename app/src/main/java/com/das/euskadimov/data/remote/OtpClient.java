@@ -15,7 +15,7 @@ public class OtpClient {
 
     private OtpClient() {
         client = new ApolloClient.Builder()
-                .serverUrl("http://10.0.2.2:9000/otp/transmodel/v3")
+                .serverUrl("https://desarrolloavanzadosoftware.duckdns.org/otp/transmodel/v3")
                 .build();
     }
 
