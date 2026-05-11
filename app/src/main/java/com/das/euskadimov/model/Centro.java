@@ -1,4 +1,4 @@
-package com.das.euskadimov;
+package com.das.euskadimov.model;
 
 import java.io.Serializable;
 
